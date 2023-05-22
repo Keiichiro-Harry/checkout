@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>申込フォーム</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+  <h1>申込フォーム</h1>
+
+  <form id="registrationForm">
+    <label for="email">メールアドレス:</label>
+    <input type="email" id="email" required><br>
+
+    <label for="firstName">名前(姓):</label>
+    <input type="text" id="firstName" required><br>
+
+    <label for="lastName">名前(名):</label>
+    <input type="text" id="lastName" required><br>
+
+    <label for="phoneticFirstName">よみがな(姓):</label>
+    <input type="text" id="phoneticFirstName" required><br>
+
+    <label for="phoneticLastName">よみがな(名):</label>
+    <input type="text" id="phoneticLastName" required><br>
+
+    <label for="phone">電話番号:</label>
+    <input type="tel" id="phone" required><br>
+
+    <label>受講講座:</label><br>
+    <input type="checkbox" id="courseA" name="course" value="A">
+    <label for="courseA">講座A</label><br>
+
+    <input type="checkbox" id="courseB" name="course" value="B">
+    <label for="courseB">講座B</label><br>
+
+    <input type="checkbox" id="courseC" name="course" value="C">
+    <label for="courseC">講座C</label><br>
+
+    <button type="submit">申込</button>
+  </form>
+  <p id="message"></p>
+  <script>
+    document.getElementById("registrationForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // 入力内容を取得
+      var courses = [];
+      var checkboxes = document.querySelectorAll('input[name="course"]:checked');
+      checkboxes.forEach(function (checkbox) {
+        courses.push(checkbox.value);
+      })
+      var data = {
+        email: document.getElementById("email").value,
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        phoneticFirstName: document.getElementById("phoneticFirstName").value,
+        phoneticLastName: document.getElementById("phoneticLastName").value,
+        phone: document.getElementById("phone").value,
+        courses: courses
+      };
+
+      fetch("http://127.0.0.1:5000/api/submit", { 
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+        .then(function (response) {
+          if (response.ok) {
+            // メッセージの表示
+            var messageElement = document.getElementById("message");
+            messageElement.textContent = "申し込みが完了しました。メールボックスをご確認ください。";
+          } else {
+            // エラーメッセージの表示
+            var messageElement = document.getElementById("message");
+            messageElement.textContent = "エラーが発生しました。お手数ですが、しばらくしてもう一度お試しください。";
+          }
+        })
+        .catch(function (error) {
+          console.error(error);
+
+          // エラーメッセージの表示
+          var messageElement = document.getElementById("message");
+          messageElement.textContent = "エラーが発生しました。お手数ですが、しばらくしてもう一度お試しください。";
+        });
+    });
+  </script>
+</body>
+
+</html>
